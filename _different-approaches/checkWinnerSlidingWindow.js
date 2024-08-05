@@ -1,3 +1,13 @@
+/*** This is more optimized solution.
+ * the following func needs to be used after every move. 
+ * From the coordinates of the player selected cell on board, the func will search left, right, up, down and diagnoals.
+ * Until a winning line is found. a winning line length is defined in parameter. 
+ * 
+ * This way, the whole board doesn't need to be scanned over and over again. 
+ * 
+ * This may not show much difference in small boards, but much efficient in larger boards. 
+ */
+
 function checkWinnerSlidingWindow(player, board, rowPos, colPos, winningLineLength) {
 
     const directions = [
