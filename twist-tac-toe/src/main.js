@@ -1,16 +1,17 @@
 import '../styles/style.css'
-import { setupGameConfig } from './gameConfig.js';
-import { setupGameBoard } from './gameBoard.js';
-import { config } from './dataGameConfig.js';
+import { ele } from './viewComponents/_htmlElementSelector.js';
+import { config } from './data/GameConfig.js';
+import gameBoardView from './viewComponents/gameBoardView.js';
+import gameConfigView from './viewComponents/gameConfigView.js';
 
 document.querySelector('#app').innerHTML = `
     <div class="container">
         
-        <div class="game-settings" id="game-config"></div>
+        <div class="game-config" id="game-config"></div>
 
-        <div class="board" id="game-board"></div>
+        <div class="game-board" id="game-board"></div>
     </div>
 `
 
-setupGameConfig(document.querySelector('#game-config'));
-setupGameBoard(document.querySelector('#game-board'), config.boardSize);
+gameConfigView.setupGameConfig(ele.getGameConfig());
+gameBoardView.generateBoard(ele.getGameBoard(), config.boardSize);

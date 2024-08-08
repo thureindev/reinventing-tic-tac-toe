@@ -1,7 +1,7 @@
 /**
  * Enum for the different states of the game.
  * @readonly
- * @enum {string}
+ * @enum {string} - One of 3 roles - p1, p2, null
  */
 const Role = Object.freeze({
     P1: 'p1',

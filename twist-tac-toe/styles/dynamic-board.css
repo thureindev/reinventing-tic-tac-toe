@@ -1,0 +1,6 @@
+.game-board {
+    display: grid;
+    /* Dynamically update the board with CSS Grid */
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);    
+}

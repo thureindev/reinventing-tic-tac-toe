@@ -3,10 +3,11 @@ import Role from '../enums/role.js';
  * Represents a player object
  */
 export default class Player {
-    constructor(name, mark) {
+    constructor(name, mark, role) {
         this.name = name;
         this.mark = mark; // An img URL or a simple string
-        this.role = Role.NONE
+        this.role = role;
+        this.score = 0;
     }
     /**
      * rename player

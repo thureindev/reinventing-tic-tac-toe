@@ -1,5 +1,6 @@
 export const config = {
-    boardSize: 3,
+    boardSizeX: 3,
+    boardSizeY: 3,
     winLength: 3,
     numPieces: 3,
     fifoOrder: true

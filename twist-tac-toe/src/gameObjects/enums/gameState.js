@@ -1,7 +1,7 @@
 /**
  * Enum for the different states of the game.
  * @readonly
- * @enum {string}
+ * @enum {string} - One of five states - PREPARING, READY, ONGOING, PAUSED, FINISHED
  * 
  */
 const GameState = {

@@ -1,3 +1,15 @@
+import Board from "../models/board";
+import Player from "../models/player";
+
+/**
+ * 
+ * @param {Board} board 
+ * @param {Player} player 
+ * @param {number} rowPos 
+ * @param {number} colPos 
+ * @param {number} winLength 
+ * @returns 
+ */
 export function winnerCheckingSlidingWindow(board, player, rowPos, colPos, winLength) {
     const directionOffsets = [
         { dr: 0, dc: 1 },  // Horizontal
