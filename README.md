@@ -11,7 +11,7 @@
    npm i vite
    ```
 3. Run vite
-  ```bash
-  npm run dev
-  ```
+   ```bash
+   npm run dev
+   ```
 4. Enjoy customizing your tic-tac-toe board. Have fun!
