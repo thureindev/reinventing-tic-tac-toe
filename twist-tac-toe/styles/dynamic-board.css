@@ -4,3 +4,9 @@
     grid-template-columns: repeat(var(--cols), 1fr);
     grid-template-rows: repeat(var(--rows), 1fr);    
 }
+
+.win-cell {
+    background-color: #FBBC39 !important;
+    color: #1a1a1a !important;
+    font-weight: 700 !important;
+}

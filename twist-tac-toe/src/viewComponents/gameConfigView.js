@@ -1,11 +1,14 @@
+import { ele } from "./_htmlElementSelector";
 import { config } from "../data/GameConfig";
-import configController from "../controllers/configController";
 import gameController from "../controllers/gameController";
 
 const gameConfigView = Object.freeze({
-    setupGameConfig: (element) => {
-        element.innerHTML = `
-        <h1>Classic Tic-Tac-Toe</h1>
+    /**
+     * Set up game config view
+     */
+    setupGameConfigView: () => {
+        ele.getGameConfig().innerHTML = `
+        <h1>Twist-Tac-Toe</h1>
         <div class="control-group">
             <div class="board-config-group">
                 <div class="input-group">
@@ -36,35 +39,34 @@ const gameConfigView = Object.freeze({
             </div>
         </div>
         `
+
+        /**
+         * Event listeners
+         * ==============================================================
+         */
+
         document.getElementById('board-size-x').addEventListener('input', (e) => {
             const x = Number(e.target.value);
-            config.boardSizeX = x;
-            // for view
-            configController.emit('config-board-size-changed', x, config.boardSizeY);
-            // for game data
             gameController.emit('config-board-size-changed', x, config.boardSizeY);
         });
         document.getElementById('board-size-y').addEventListener('input', (e) => {
             const y = Number(e.target.value);
-            config.boardSizeY = y;
-            // for view
-            configController.emit('config-board-size-changed', config.boardSizeX, y);
-            // for game data
             gameController.emit('config-board-size-changed', config.boardSizeX, y);
         });
 
         document.getElementById('win-length').addEventListener('input', (e) => {
             const len = Number(e.target.value);
-            config.winningLineLength = len;
-            gameController.emit('config-winLength-changed', len);
+            gameController.emit('config-win-length-changed', len);
         });
 
         document.getElementById('num-pieces').addEventListener('input', (e) => {
-            config.numPieces = Number(e.target.value);
+            const num = Number(e.target.value);
+            gameController.emit('config-num-pieces-changed', num);
         });
 
         document.getElementById('fifo-order').addEventListener('change', (e) => {
-            config.fifoOrder = e.target.checked;
+            const isFifo = e.target.checked;
+            gameController.emit('config-fifo-order-changed', isFifo);
         });
 
         document.getElementById('start-match').addEventListener('click', (e) => {
@@ -75,8 +77,6 @@ const gameConfigView = Object.freeze({
         })
         document.getElementById('reset-match').addEventListener('click', (e) => {
             gameController.emit('reset-match');
-
-            configController.emit('reset-match');
         })
     }
 });
