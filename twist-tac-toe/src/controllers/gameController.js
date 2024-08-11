@@ -3,8 +3,9 @@ import { ele } from '../viewComponents/_htmlElementSelector';
 import gameBoardView from '../viewComponents/gameBoardView';
 
 import { game } from "../data/Game";
+import { gameConfig } from '../data/GameConfig';
 import GameState from "../gameObjects/enums/gameState";
-import { config } from '../data/GameConfig';
+import GameProp from '../gameObjects/enums/gameProp';
 
 const gameController = new EventHandler();
 
@@ -24,7 +25,13 @@ gameController.on('clicked-board-cell', (x, y) => {
         // TODO: show error invalid move
         console.log('Invalid move at cell', x, y);
         if (game.getGameState() !== GameState.ONGOING) {
-            alert('The game has not started yet. Please start the match. GameState: ' + game.getGameState());
+            if (game.getGameState() === GameState.FINISHED) {
+                alert('Previous game has finished. Please start next game. GameState: ' + game.getGameState());
+            }
+            else {
+                alert('The match has not started yet. Please start the match. GameState: ' + game.getGameState());
+            }
+            
         }
         else {
             alert('Invalid move at cell' + x + '-' + y);
@@ -61,85 +68,142 @@ gameController.on('clicked-board-cell', (x, y) => {
         }
     }
 });
-
+// ======================================================================
 gameController.on('config-board-size-changed', (x, y) => {
-    if (game.getGameState() !== GameState.ONGOING && game.getGamesPlayedInMatch() <= 0) {
-        // update data
-        game.getBoard().updateSize(x, y);
-        config.boardSizeX = x;
-        config.boardSizeY = y;
-        // update view
-        gameBoardView.generateBoard(x, y);
-        // TODO: notify user
-        //
 
-        // check the appropriate winLength
-        if (x < config.winLength || y < config.winLength) {
-            const newWinLength = x < y ? x : y;
-            // data
-            game.updateWinLength(newWinLength);
-            config.winLength = newWinLength;
-            // update view
-            ele.getInputWinLength().value = newWinLength;
-            // TODO: notify user
-            console.log("win-length adjusted to fit within board");
-        }
+    const updateSuccess = game.updateGameConfig(GameProp.SIZE, { x, y });
+    if (updateSuccess) {
+        //  //  game win length is calculated and updated according to size of the board.
+        const newWinLength = game.getWinningLineLength();
+        // VIEW UPDATE
+        //  //  input
+        ele.getInputWinLength().value = newWinLength;
+        //  //  board
+        gameBoardView.generateBoard(x, y);
+        //
+        // update game config file
+        gameConfig.updateGameConfigData({ boardSizeX: x, boardSizeY: y, winLength: newWinLength });
     }
     else {
-        ele.getInputBoardSizeX().value = config.boardSizeX;
-        ele.getInputBoardSizeY().value = config.boardSizeY;
-        alert("Cannot change board size while playing. Reset match if you want to play with new configs.")
-    }
-});
-
-gameController.on('config-win-length-changed', (len) => {
-    // ensure winLength will not be changed during a match
-    if (game.getGameState() !== GameState.ONGOING && game.getGamesPlayedInMatch() <= 0) {
-        // check the appropriate winLength
-        if (config.boardSizeX >= len || config.boardSizeY >= len) {
-            config.winLength = len;
-            game.updateWinLength(len);
+        // VIEW UPDATE
+        //  //  reset the changed values in view to previous data in game object. 
+        ele.getInputBoardSizeX().value = game.getBoard().getSize()['x'];
+        ele.getInputBoardSizeY().value = game.getBoard().getSize()['y'];
+        ele.getInputWinLength().value = game.getWinningLineLength();
+        //
+        // TODO: notify user
+        if (game.isDuringMatch()) {
+            alert("Cannot change board size while playing. Reset match if you want to play with new configs.")
         }
         else {
-            ele.getInputWinLength().value = config.winLength;
-            alert("Win-length cannot be longer than any side of the board.");
+            alert("Please enter a valid board size.");
+        }
+        
+    }
+});
+// ======================================================================
+gameController.on('config-win-length-changed', (len) => {
+
+    const updateSuccess = game.updateGameConfig(GameProp.WIN_LENGTH, { len });
+    if (updateSuccess) {
+        // update game config file
+        gameConfig.updateGameConfigData({ winLength: len });
+    }
+    else {
+        // VIEW UPDATE
+        //  //  reset the changed values in view to previous data in game object. 
+        ele.getInputWinLength().value = game.getWinningLineLength();
+        //
+        // TODO: notify user
+        if (game.isDuringMatch()) {
+            alert("Cannot change board size while playing. Reset match if you want to play with new configs.")
+        }
+        else {
+            alert("Win length cannot be longer than any side of the board.")
         }
     }
+});
+// ======================================================================
+gameController.on('config-is-limited-pieces-changed', (isLimited) => {
+
+    const updateSuccess = game.updateGameConfig(GameProp.IS_LIMITED_PIECES, { isLimited });
+    if (updateSuccess) {
+        // update game config file
+        gameConfig.updateGameConfigData({ isLimitedPieces: isLimited });
+    }
     else {
-        ele.getInputWinLength().value = config.winLength;
-        alert("Cannot change game configs while playing. Reset match if you want to play with new configs.");
+        // VIEW UPDATE
+        //  //  reset the changed values in view to previous data in game object. 
+        ele.getInputIsLimitedPieces().checked = game.getIsLimitedPieces();
+        //
+        // TODO: notify user
+        if (game.isDuringMatch()) {
+            alert("Cannot change board size while playing. Reset match if you want to play with new configs.")
+        }
+        else {
+            alert("Please enter a valid boolean value.")
+        }
     }
 });
-
+// ======================================================================
 gameController.on('config-num-pieces-changed', (num) => {
-    if (game.getGameState() !== GameState.ONGOING && game.getGamesPlayedInMatch() <= 0) {
-        config.numPieces = num;
-        // TODO: update game object
+
+    const updateSuccess = game.updateGameConfig(GameProp.NUM_PIECES, { num });
+    if (updateSuccess) {
+        // update game config file
+        gameConfig.updateGameConfigData({ numPieces: num });
     }
     else {
-        ele.getInputNumPieces().value = config.numPieces;
-        alert("Cannot change game configs while playing. Reset match if you want to play with new configs.")
+        // VIEW UPDATE
+        //  //  reset the changed values in view to previous data in game object. 
+        ele.getInputNumPieces().value = game.getNumPiecesEachPlayer();
+        //
+        // TODO: notify user
+        if (game.isDuringMatch()) {
+            alert("Cannot change board size while playing. Reset match if you want to play with new configs.")
+        }
+        else {
+            alert("Number of pieces cannot exceed total number of squares on board.")
+        }
     }
 });
+// ======================================================================
+gameController.on('config-is-fifo-order-changed', (isFifo) => {
 
-gameController.on('config-fifo-order-changed', (isFifo) => {
-    if (game.getGameState() !== GameState.ONGOING && game.getGamesPlayedInMatch() <= 0) {
-        config.fifoOrder = isFifo;
-        // TODO: update game object
+    const updateSuccess = game.updateGameConfig(GameProp.IS_FIFO_ORDER, { isFifo });
+    if (updateSuccess) {
+        // update game config file
+        gameConfig.updateGameConfigData({ isFifoOrder: isFifo });
     }
     else {
-        ele.getInputFifoOrder().value = config.fifoOrder;
-        alert("Cannot change game configs while playing. Reset match if you want to play with new configs.")
+        // VIEW UPDATE
+        //  //  reset the changed values in view to previous data in game object. 
+        ele.getInputIsFifoOrder().checked = game.getIsFifoOrder();
+        //
+        // TODO: notify user
+        if (game.isDuringMatch()) {
+            alert("Cannot change board size while playing. Reset match if you want to play with new configs.")
+        }
+        else {
+            alert("Please enter a valid boolean value.")
+        }
     }
 });
 
 /**
  * match can be started only when game is ready to play. 
  */
+// ======================================================================
 gameController.on('start-match', () => {
     if (game.getGameState() === GameState.READY) {
         game.startGame();
         alert('Game has started. GameState: ' + game.getGameState())
+    }
+    else if (game.getGameState() === GameState.FINISHED) {
+        alert('Previous game has finished. Please start next game. GameState: ' + game.getGameState());
+    }
+    else if (game.getGameState() === GameState.ONGOING) {
+        alert('Game is already ongoing. GameState: ' + game.getGameState());
     }
     else {
         alert('Game is not ready yet. GameState: ' + game.getGameState());
@@ -149,24 +213,27 @@ gameController.on('start-match', () => {
 /**
  * Only after previous game is finished, next game can be carried out.
  */
+// ======================================================================
 gameController.on('next-game', () => {
     if (game.getGameState() === GameState.FINISHED) {
         game.nextGame();
         // Just cleaning the inner text of each cell is valid. 
         // but for simplicity here. I just used generateBoard to clean the board.
         gameBoardView.generateBoard(game.getBoard().getSize()['x'], game.getBoard().getSize()['y']);
+
+        game.startGame();
     }
     else if (game.getGameState() === GameState.ONGOING) {
-        alert('Plese finish this game first.. GameState: ' + game.getGameState());
+        alert('Plese finish the ongoing game first. GameState: ' + game.getGameState());
     }
     else {
         alert('Please start the match. GameState: ' + game.getGameState());
     }
 });
-
 /**
  * regardless of game state reset-match can be carried out.
  */
+// ======================================================================
 gameController.on('reset-match', () => {
     const confirmed = confirm('The scores will be reset. Are you sure you want to reset the match?');
     if (confirmed) {
