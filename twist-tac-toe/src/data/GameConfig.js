@@ -1,7 +1,12 @@
-export const config = {
+export const gameConfig = {
     boardSizeX: 4,
     boardSizeY: 5,
     winLength: 3,
-    numPieces: 3,
-    fifoOrder: true
+    isLimitedPieces: true,
+    numPieces: 0,
+    isFifoOrder: true,
+    
+    updateGameConfigData: function (updates) {
+        Object.assign(this, updates);
+    }
 }

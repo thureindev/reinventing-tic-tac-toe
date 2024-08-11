@@ -68,10 +68,6 @@ const gameBoardView = Object.freeze({
      */
     handlePlaceMark: (x, y, mark) => {
         const cell = document.querySelector(`[data-cell="${x}-${y}"]`);
-
-        console.log(cell);
-        console.log('iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
-        
         cell.innerText = mark;
     },
     /**
@@ -81,10 +77,6 @@ const gameBoardView = Object.freeze({
      */
     addClassForUniqueCell: (x, y) => {
         const cell = document.querySelector(`[data-cell="${x}-${y}"]`);
-
-        console.log(cell);
-        console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
-
         cell.classList.add('win-cell');
     },
 

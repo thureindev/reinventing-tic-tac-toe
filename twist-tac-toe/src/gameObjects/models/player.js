@@ -20,6 +20,8 @@ export default class Player {
         // for twist-tac-toe
         this.moveHistory = [];
         this.totalMoves = 0;
+
+        this.numPieces = 0;
     }
     /**
      * Rename player.
@@ -130,5 +132,12 @@ export default class Player {
      */
     getTotalMoves() {
         return this.totalMoves;
+    }
+    /**
+     * 
+     * @returns {number} - returns total number of pieces to be played on board. 
+     */
+    getNumPieces() {
+        return this.numPieces;
     }
 }

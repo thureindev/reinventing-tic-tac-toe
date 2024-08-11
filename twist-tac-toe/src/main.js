@@ -1,5 +1,5 @@
 import '../styles/style.css'
-import { config } from './data/GameConfig.js';
+import { gameConfig } from './data/GameConfig.js';
 import gameBoardView from './viewComponents/gameBoardView.js';
 import gameConfigView from './viewComponents/gameConfigView.js';
 
@@ -12,5 +12,5 @@ document.querySelector('#app').innerHTML = `
     </div>
 `
 
-gameConfigView.setupGameConfigView();
-gameBoardView.generateBoard(config.boardSizeX, config.boardSizeY);
+gameConfigView.setupGameConfigView(gameConfig);
+gameBoardView.generateBoard(gameConfig.boardSizeX, gameConfig.boardSizeY);
