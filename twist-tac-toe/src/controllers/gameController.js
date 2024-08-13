@@ -31,7 +31,7 @@ gameController.on('clicked-board-cell', (x, y) => {
             else {
                 alert('The match has not started yet. Please start the match. GameState: ' + game.getGameState());
             }
-            
+
         }
         else {
             alert('Invalid move at cell' + x + '-' + y);
@@ -39,6 +39,14 @@ gameController.on('clicked-board-cell', (x, y) => {
     }
     else {
         console.log('Validly moved at cell' + x + '-' + y);
+
+        // UPDATE VIEW 
+        // for limited pieces game play
+        const cell = game.eliminatePreviousMovePiece();
+        if (cell) {
+            gameBoardView.handleRemoveMark(cell['x'], cell['y']);
+        }
+
         // update the view component
         gameBoardView.handlePlaceMark(x, y, playerMark);
 
@@ -98,7 +106,7 @@ gameController.on('config-board-size-changed', (x, y) => {
         else {
             alert("Please enter a valid board size.");
         }
-        
+
     }
 });
 // ======================================================================
@@ -106,8 +114,11 @@ gameController.on('config-win-length-changed', (len) => {
 
     const updateSuccess = game.updateGameConfig(GameProp.WIN_LENGTH, { len });
     if (updateSuccess) {
+        // VIEW UPDATE
+        // input num pieces
+        ele.getInputNumPieces().value = game.getNumPiecesEachPlayer();
         // update game config file
-        gameConfig.updateGameConfigData({ winLength: len });
+        gameConfig.updateGameConfigData({ winLength: len, numPieces: game.getNumPiecesEachPlayer() });
     }
     else {
         // VIEW UPDATE
@@ -128,8 +139,11 @@ gameController.on('config-is-limited-pieces-changed', (isLimited) => {
 
     const updateSuccess = game.updateGameConfig(GameProp.IS_LIMITED_PIECES, { isLimited });
     if (updateSuccess) {
+        // VIEW UPDATE
+        //  //  input
+        ele.getInputNumPieces().value = game.getNumPiecesEachPlayer();
         // update game config file
-        gameConfig.updateGameConfigData({ isLimitedPieces: isLimited });
+        gameConfig.updateGameConfigData({ isLimitedPieces: isLimited, numPieces: game.getNumPiecesEachPlayer() });
     }
     else {
         // VIEW UPDATE
@@ -141,6 +155,7 @@ gameController.on('config-is-limited-pieces-changed', (isLimited) => {
             alert("Cannot change board size while playing. Reset match if you want to play with new configs.")
         }
         else {
+            console.log(isLimited);
             alert("Please enter a valid boolean value.")
         }
     }
@@ -220,7 +235,8 @@ gameController.on('next-game', () => {
         // Just cleaning the inner text of each cell is valid. 
         // but for simplicity here. I just used generateBoard to clean the board.
         gameBoardView.generateBoard(game.getBoard().getSize()['x'], game.getBoard().getSize()['y']);
-
+        //
+        // start game immediately 
         game.startGame();
     }
     else if (game.getGameState() === GameState.ONGOING) {

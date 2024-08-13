@@ -28,7 +28,7 @@ const gameConfigView = Object.freeze({
 
                 <div class="input-group">
                     <label for="is-limited-pieces">Limited Pieces for each player:</label>
-                    <input type="checkbox" id="is-limited-pieces" name="is-limited-pieces" ${config.isLimitedPieces && 'checked'}>
+                    <input type="checkbox" id="is-limited-pieces" name="is-limited-pieces" ${config.isLimitedPieces ? 'checked' : ''}>
                 </div>
 
                 <div class="input-group">
@@ -39,7 +39,7 @@ const gameConfigView = Object.freeze({
                 
                 <div class="input-group">
                     <label for="is-fifo-order">Remove Pieces by FIFO Order:</label>
-                    <input type="checkbox" id="is-fifo-order" name="is-fifo-order" ${config.isFifoOrder && 'checked'}
+                    <input type="checkbox" id="is-fifo-order" name="is-fifo-order" ${config.isFifoOrder ? 'checked' : ''}
                     ${config.isLimitedPieces ? '' : 'disabled'}>
                 </div>
                 

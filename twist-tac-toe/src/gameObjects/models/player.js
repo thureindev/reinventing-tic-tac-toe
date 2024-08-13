@@ -44,6 +44,12 @@ export default class Player {
         return true;
     }
     /**
+     * Update number of pieces the player has. 
+     */
+    updateNumPieces(num) {
+        this.numPieces = num;
+    }
+    /**
      * Add score.
      * 
      * @param {number} score - player's score

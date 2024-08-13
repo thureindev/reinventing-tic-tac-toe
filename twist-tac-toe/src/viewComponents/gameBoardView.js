@@ -70,6 +70,10 @@ const gameBoardView = Object.freeze({
         const cell = document.querySelector(`[data-cell="${x}-${y}"]`);
         cell.innerText = mark;
     },
+    handleRemoveMark: (x, y) => {
+        const cell = document.querySelector(`[data-cell="${x}-${y}"]`);
+        cell.innerText = '';
+    },
     /**
      * 
      * @param {number} x - x position

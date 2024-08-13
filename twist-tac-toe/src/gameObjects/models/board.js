@@ -76,6 +76,17 @@ export default class Board {
         } catch (err) { console.log(err); }
     }
     /**
+     * 
+     * @param {number} x - The x-coordinate of the cell on 2D array board.
+     * @param {number} y - The y-coordinate of the cell on 2D array board.
+     * @returns {boolean} - boolean
+     */
+    removeMark(x, y) {
+        this.cells[y][x] = null;
+        this.totalOccupiedCells--;
+        return true;
+    }
+    /**
      * Getter funcs ==========================================
      * 
      * 

@@ -31,169 +31,71 @@ export default class Game {
         numPieces = gameConfig.numPieces,
         isFifoOrder = gameConfig.isFifoOrder
     ) {
-        this.winLength = winLength;
-        this.isLimitedPieces = false;
-        this.numPieces = numPieces;
-        this.isFifoOrder = isFifoOrder;
-
+        this.config = {
+            winLength: winLength,
+            isLimitedPieces: false,
+            numPieces: numPieces,
+            isFifoOrder: isFifoOrder,
+        }
         this.board = new Board(boardSizeX, boardSizeY);
         this.player1 = new Player('Player 1', 'X', Role.P1);
         this.player2 = new Player('Player 2', 'O', Role.P2);
-        this.currentPlayer = this.player1;
-        this.winner = Role.NONE;
-        this.winCells = [];
-
         this.firstTurnPlayer = this.player1;
+        this.currentPlayer = this.firstTurnPlayer;
+        this.winner = Role.NONE;
         this.totalGamesPlayed = 0;
-
+        // for visual cue
+        this.winCells = [];
+        // game state tracker
         this.state = GameState.READY;
-    }
-    /**
-     * 
-     * @param {string} prop - Name of the game object property to update
-     * @param {Object} arg - Object containing passed arguments
-     * @returns 
-     */
-    updateGameConfig(prop, arg) {
-
-        // Updating game configs is not allowed during an ongoing match.
-        if (this.state !== GameState.ONGOING && this.totalGamesPlayed <= 0) {
-            // select the property to update and call the function.
-            switch (prop) {
-                case GameProp.SIZE:
-                    return this.updateProp().size(arg['x'], arg['y']);
-                case GameProp.WIN_LENGTH:
-                    return this.updateProp().winLength(arg['len']);
-                case GameProp.IS_LIMITED_PIECES:
-                    return this.updateProp().isLimitedPieces(arg['isLimited']);
-                case GameProp.NUM_PIECES:
-                    return this.updateProp().numPieces(arg['num']);
-                case GameProp.IS_FIFO_ORDER:
-                    return this.updateProp().isFifoOrder(arg['isFifo']);
-                default:
-                    return false;
-            }
-        }
-        return false;
-    }
-    /**
-     * To check if the match is ongoing. 
-     * 
-     * @returns {boolean} - boolean
-     */
-    isDuringMatch() {
-        if (this.state !== GameState.ONGOING && this.totalGamesPlayed <= 0) {
-            return false;
-        }
-        return true;
     }
     /**
      * ==============================================================
-     * Reusabel update function
-     * 
+     * ================= GAME-PREP-PUBLIC-FUNCS =====================
      */
-    updateProp() {
-        return Object.freeze({
-            /**
-             * @param {number} x - 
-             * @param {number} y - 
-             * @returns {boolean} - boolean
-             */
-            size: (x, y) => {
-                this.board.updateSize(x, y);
-                // check the appropriate winLength and update it.
-                if (x < this.winLength || y < this.winLength) {
-                    const newWinLength = x < y ? x : y;
-                    this.winLength = newWinLength;
-                }
-                return true;
-            },
-            /**
-             * @param {number} len - 
-             * @returns {boolean} - boolean
-             */
-            winLength: (len) => {
-                // check the appropriate winLength
-                if (this.getBoard().getSize()['x'] >= len || this.getBoard().getSize()['y'] >= len) {
-                    this.winLength = len;
-                    return true;
-                }
-                return false;
-            },
-            /**
-             * 
-             * @param {boolean} isLimited - 
-             * @returns {boolean} - boolean
-             */
-            isLimitedPieces: (isLimited) => {
-                this.isLimitedPieces = isLimited;
-                return true;
-            },
-            /**
-             * 
-             * @param {number} num - 
-             * @returns {boolean} - boolean
-             */
-            numPieces: (num) => {
-                // check the appropriate winLength
-                if (this.getBoard().getSize()['x'] * this.getBoard().getSize()['y'] >= num) {
-                    game.updateNumPiecesEachPlayer(num);
-                    return true;
-                }
-                return false;
-            },
-            /**
-             * 
-             * @param {boolean} isFifo - 
-             * @returns {boolean} - boolean
-             */
-            isFifoOrder: (isFifo) => {
-                this.isFifoOrder = isFifo;
-                return true;
-            },
-
-        });
-    }
     /**
+     * -----------------------------------------------------------------
      * 
-     * @param {number} num 
-     */
-    updateNumPiecesEachPlayer(num) {
-        if (this.state !== GameState.ONGOING) {
-            this.numPieces = num
-        }
-    }
-    /**
      * Prepare the game by resetting the gaem board, sorting out turns and resetting players attributes. 
      */
-    readyGame() {
+    readyGame(firstTurnPlayer = this.firstTurnPlayer) {
         this.state = GameState.PREPARING;
+
         this.board.resetBoard();
-        this.currentPlayer = this.firstTurnPlayer;
-        this.currentPlayer.resetPlayerMoveHistory();
+        this.player1.resetPlayerMoveHistory();
+        this.player2.resetPlayerMoveHistory();
+        this.currentPlayer = firstTurnPlayer;
         this.winner = Role.NONE;
         this.winCells = [];
 
         this.state = GameState.READY;
     }
     /**
+     * -----------------------------------------------------------------
+     * 
      * @param {Player} [firstTurnPlayer] 
      */
     resetMatch(firstTurnPlayer = this.player1) {
         this.player1.resetScore();
         this.player2.resetScore();
-
-        this.firstTurnPlayer = firstTurnPlayer;
         this.totalGamesPlayed = 0;
+        this.firstTurnPlayer = firstTurnPlayer;
         this.readyGame();
     }
     /**
+     * -----------------------------------------------------------------
+     * 
      * Prepares to start a match by resetting the match and starting a set.
      */
     startGame() {
+        // set game mode
+        // 
+        // start game
         this.state = GameState.ONGOING;
     }
     /**
+     * -----------------------------------------------------------------
+     * 
      * Prepares to ready up next game by swapping players' turns and carry out ready up procedures.
      */
     nextGame() {
@@ -201,9 +103,42 @@ export default class Game {
         this.readyGame();
     }
     /**
+     * ==============================================================
+     * ==================== UPDATE-PUBLIC-FUNCS =====================
+     * 
+     * -----------------------------------------------------------------
+     * Update game configuration data
+     * 
+     * @param {string} prop - Name of the game object property to update
+     * @param {Object} arg - Object containing passed arguments
+     * @returns 
+     */
+    updateGameConfig(prop, arg) {
+        // Updating game configs is not allowed during an ongoing match.
+        if (!this.isDuringMatch()) {
+            // select the property to update and call the function.
+            switch (prop) {
+                case GameProp.SIZE:
+                    return this.updateConfigProp().size(arg['x'], arg['y']);
+                case GameProp.WIN_LENGTH:
+                    console.log(this.updateConfigProp());
+                    return this.updateConfigProp().winLength(arg['len']);
+                case GameProp.IS_LIMITED_PIECES:
+                    return this.updateConfigProp().isLimitedPieces(arg['isLimited']);
+                case GameProp.NUM_PIECES:
+                    return this.updateConfigProp().numPieces(arg['num']);
+                case GameProp.IS_FIFO_ORDER:
+                    return this.updateConfigProp().isFifoOrder(arg['isFifo']);
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
+    /**
+     * -----------------------------------------------------------------
      * 
      * Update game state after checking winner and draw conditions. If nothing else, continue the game
-     * 
      * @param {number} posX - X axis position on game board
      * @param {number} posY - Y axis position on game board
      */
@@ -232,6 +167,11 @@ export default class Game {
         }
     }
     /**
+     * ==============================================================
+     * ====================== CORE-GAME-LOGIC =======================
+     */
+    /**
+     * -----------------------------------------------------------------
      * 
      * @param {number} x 
      * @param {number} y 
@@ -240,41 +180,65 @@ export default class Game {
      * @example [{x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}]
      */
     checkWinner(x, y) {
-        return winnerCheckingSlidingWindow(this.board.cells, this.currentPlayer.role, x, y, this.winLength);
+        return winnerCheckingSlidingWindow(this.board.cells, this.currentPlayer.role, x, y, this.config.winLength);
     }
-
     /**
+     * -----------------------------------------------------------------
+     * Validate there are legal moves left to play on board.
      * 
      * @returns {boolean} - returns true or false after checking valid moves.
      */
     checkValidMoves() {
+        // The logic used to validate moves will be affected by 'isLimitedPieces' and 'isFifoOrder'
         return this.board.hasPlayableSquares();
     }
     /**
+     * -----------------------------------------------------------------
+     * Validate the player made a legal move and update data for it.
      * 
      * @param {number} x - X axis position on game board
      * @param {number} y - Y axis position on game board
-     * @returns {boolean}
+     * @returns {boolean} - boolean
      */
     playerMakeMove(x, y) {
+        // The logic used to validate moves will be affected by 'isLimitedPieces' and 'isFifoOrder'
+
         // only proceed if game is ongoing
         if (this.state !== GameState.ONGOING) return false;
 
         const isMarkPlaced = this.board.placeMark(x, y, this.currentPlayer.role);
         if (isMarkPlaced) {
             this.currentPlayer.updatePlayerMove(x, y);
-
-            console.log('=================================');
-            console.log('=================================');
-            console.log(this.board.cells);
-            console.log('=================================');
-            console.log(this.player1.moveHistory);
-            console.log(this.player2.moveHistory);
             return true;
         }
         return false;
     }
+    eliminatePreviousMovePiece(cellX = 0, cellY = 0) {
+        // gameplay logic check
+        const isLimited = this.getIsLimitedPieces();
+        const playerTotalMoves = this.currentPlayer.getTotalMoves();
+        const numPieces = this.getNumPiecesEachPlayer();
+
+        // Gameplay logic check
+        if (isLimited && playerTotalMoves > numPieces) {
+            if (this.getIsFifoOrder()) {
+                const { x, y } = this.currentPlayer.getMoveHistory()[playerTotalMoves - numPieces - 1];
+                
+                this.board.removeMark(x, y);
+                return { x, y };
+            }
+            else {
+                // const history = this.currentPlayer.getMoveHistory().slice
+            }
+        }
+        return false;
+    }
     /**
+     * ==============================================================
+     * ======================= HELPER-FUNCS =========================
+     */
+    /**
+     * -----------------------------------------------------------------
      * 
      * @returns {Player} - swap turn and returns Player object 
      */
@@ -289,71 +253,180 @@ export default class Game {
         return this.firstTurnPlayer = this.firstTurnPlayer === this.player1 ? this.player2 : this.player1;
     }
     /**
-     * Getters ===============================================
-     * 
-     * @returns {number} - The length of winning decision line on board.
-     */
-    getWinningLineLength() {
-        return this.winLength;
-    }
-    /**
+     * To check if the match is ongoing. 
      * 
      * @returns {boolean} - boolean
      */
-    getIsLimitedPieces() {
-        return this.isLimitedPieces;
+    isDuringMatch() {
+        if (this.state !== GameState.ONGOING && this.totalGamesPlayed <= 0) {
+            return false;
+        }
+        return true;
     }
     /**
+     * Update Number of Pieces for each player
      * 
+     * @param {number} num - number of pieces each player has. 
+     */
+    updateNumPiecesEachPlayer(num) {
+        this.config.numPieces = num;
+        this.player1.updateNumPieces(num);
+        this.player2.updateNumPieces(num);
+    }
+    /**
+     * -----------------------------------------------------------------
+     * Reusabel update config function
+     * 
+     */
+    updateConfigProp() {
+        return Object.freeze({
+            /**
+             * @param {number} x - 
+             * @param {number} y - 
+             * @returns {boolean} - boolean
+             */
+            size: (x, y) => {
+                this.board.updateSize(x, y);
+                // check the appropriate winLength and update it.
+                if (x < this.config.winLength || y < this.config.winLength) {
+                    const newWinLength = x < y ? x : y;
+                    this.config.winLength = newWinLength;
+                }
+                return true;
+            },
+            /**
+             * @param {number} len - 
+             * @returns {boolean} - boolean
+             */
+            winLength: (len) => {
+                // check the appropriate winLength
+                if (this.getBoard().getSize()['x'] >= len || this.getBoard().getSize()['y'] >= len) {
+
+                    // cannot be less than 3
+                    if (len < 3) {
+                        this.config.winLength = 3;
+                    }
+                    else {
+                        this.config.winLength = len;
+                    }
+                    return true;
+                }
+                return false;
+            },
+            /**
+             * 
+             * @param {boolean} isLimited - 
+             * @returns {boolean} - boolean
+             */
+            isLimitedPieces: (isLimited) => {
+                this.config.isLimitedPieces = isLimited;
+                // update num pieces accordingly. 
+                // cannot be less than winlength
+                if (isLimited === true && this.config.numPieces < this.config.winLength) {
+                    this.config.numPieces = this.config.winLength;
+                }
+                return true;
+            },
+            /**
+             * 
+             * @param {number} num - 
+             * @returns {boolean} - boolean
+             */
+            numPieces: (num) => {
+                // check the appropriate winLength
+                const sizeX = this.getBoard().getSize()['x'];
+                const sizeY = this.getBoard().getSize()['y'];
+                if (sizeX * sizeY >= num) {
+                    this.updateNumPiecesEachPlayer(num);
+
+                    if (this.config.numPieces < this.config.winLength) {
+                        this.config.numPieces = this.config.winLength;
+                    }
+                    return true;
+                }
+                return false;
+            },
+            /**
+             * 
+             * @param {boolean} isFifo - 
+             * @returns {boolean} - boolean
+             */
+            isFifoOrder: (isFifo) => {
+                this.config.isFifoOrder = isFifo;
+                return true;
+            },
+
+        });
+    }
+    /**
+     * ==============================================================
+     * ======================= GETTER-FUNCS =========================
+     */
+    /**
+     * -----------------------------------------------------------------
+     * @returns {number} - The length of winning decision line on board.
+     */
+    getWinningLineLength() {
+        return this.config.winLength;
+    }
+    /**
+     * -----------------------------------------------------------------
+     * @returns {boolean} - boolean
+     */
+    getIsLimitedPieces() {
+        return this.config.isLimitedPieces;
+    }
+    /**
+     * -----------------------------------------------------------------
      * @returns {number} - Number of pieces each player has and can play on board.
      */
     getNumPiecesEachPlayer() {
-        return this.numPieces;
+        return this.config.numPieces;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {boolean} - First in first out elimination option for pieces played on board. 
      */
     getIsFifoOrder() {
-        return this.isFifoOrder;
+        return this.config.isFifoOrder;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {Board} - Game board
      */
     getBoard() {
         return this.board;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {Player} - Get Player One object
      */
     getPlayer1() {
         return this.player1;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {Player} - Get Player Two object
      */
     getPlayer2() {
         return this.player2;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {Player} - Get Current Player object
      */
     getCurrentPlayer() {
         return this.currentPlayer;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {Role} - Get Role object which represents the winner of a game. 
      */
     getGameWinner() {
         return this.winner;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {Role} - Get Role object of a player who's score is higher. Returns null if scores are equal
      */
     getMatchLeadingPlayer() {
@@ -366,7 +439,7 @@ export default class Game {
         return Role.NONE;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {Object[]} - Get array of number objects. 
      * @example [{0, 2}, {1, 2}, {2, 2}]
      */
@@ -374,21 +447,21 @@ export default class Game {
         return this.winCells;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {Player} - returns player who play first turn this game.
      */
     getPlayerToPlayFirst() {
         return this.firstTurnPlayer;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {number} - total games played in this match.
      */
     getGamesPlayedInMatch() {
         return this.totalGamesPlayed;
     }
     /**
-     * 
+     * -----------------------------------------------------------------
      * @returns {GameState} - returns game state
      */
     getGameState() {
