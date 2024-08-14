@@ -13,4 +13,9 @@ export const ele = Object.freeze({
     getBtnNextGame: () => document.getElementById('next-game'),
     getBtnResetMatch: () => document.getElementById('reset-match'),
 
+    getCellOnBoard: (x, y) => document.querySelector(`[data-cell="${x}-${y}"]`),
+    getCellChildSquareName: (x, y) => document.querySelector(`[data-square-name="${x + 1}-${y + 1}"]`),
+    getCellChildMark: (x, y) => document.querySelector(`[data-cell="${x}-${y}"] > .mark`),
+    getCellChildMoveOrder: (x, y) => document.querySelector(`[data-cell="${x}-${y}"] > .move-order`),
+
 });

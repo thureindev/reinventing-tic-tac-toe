@@ -25,6 +25,8 @@ export default class Board {
      * @param {number} y - total number of columns on board
      */
     updateSize(x, y) {
+        if (x < 3 || y < 3) return false;
+        
         this.xLen = x;
         this.yLen = y;
         /** 

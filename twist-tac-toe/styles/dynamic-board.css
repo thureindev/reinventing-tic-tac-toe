@@ -1,3 +1,13 @@
+.win-cell {
+    --win-cell-bg-color: #FBBC39;
+    --win-cell-color: #1a1a1a;
+}
+/* .marked-cell-p1 {
+    --p1-marked-alpha
+    --p1-marked-color: rgba(255, 255, 255, 0.87);
+    --p1-bg-color: rgba(200, 200, 200, )
+} */
+
 .game-board {
     display: grid;
     /* Dynamically update the board with CSS Grid */
@@ -6,7 +16,7 @@
 }
 
 .win-cell {
-    background-color: #FBBC39 !important;
-    color: #1a1a1a !important;
+    background-color: var(--win-cell-bg-color) !important;
+    color: var(--win-cell-color) !important;
     font-weight: 700 !important;
 }

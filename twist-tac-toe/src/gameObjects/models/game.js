@@ -5,6 +5,7 @@ import GameState from '../enums/gameState.js';
 import GameProp from '../enums/gameProp.js';
 import { winnerCheckingSlidingWindow } from '../utils/winnerCheck.js';
 import { gameConfig } from '../../data/GameConfig.js';
+import ObjHelper from '../utils/ObjHelper.js';
 
 /**
  * Represents a game object
@@ -28,12 +29,13 @@ export default class Game {
         boardSizeX = gameConfig.boardSizeX,
         boardSizeY = gameConfig.boardSizeY,
         winLength = gameConfig.winLength,
+        isLimited = gameConfig.isLimitedPieces,
         numPieces = gameConfig.numPieces,
         isFifoOrder = gameConfig.isFifoOrder
     ) {
         this.config = {
             winLength: winLength,
-            isLimitedPieces: false,
+            isLimitedPieces: isLimited,
             numPieces: numPieces,
             isFifoOrder: isFifoOrder,
         }
@@ -121,7 +123,6 @@ export default class Game {
                 case GameProp.SIZE:
                     return this.updateConfigProp().size(arg['x'], arg['y']);
                 case GameProp.WIN_LENGTH:
-                    console.log(this.updateConfigProp());
                     return this.updateConfigProp().winLength(arg['len']);
                 case GameProp.IS_LIMITED_PIECES:
                     return this.updateConfigProp().isLimitedPieces(arg['isLimited']);
@@ -213,22 +214,40 @@ export default class Game {
         }
         return false;
     }
-    eliminatePreviousMovePiece(cellX = 0, cellY = 0) {
+    eliminatePreviousMovePiece(xPos = null, yPos = null) {
         // gameplay logic check
         const isLimited = this.getIsLimitedPieces();
         const playerTotalMoves = this.currentPlayer.getTotalMoves();
         const numPieces = this.getNumPiecesEachPlayer();
-
         // Gameplay logic check
         if (isLimited && playerTotalMoves > numPieces) {
+
+            console.log('did check yes');
+
+            const earliestMoveIndex = playerTotalMoves - numPieces;
+            const moveToTakeout = earliestMoveIndex - 1;
+
             if (this.getIsFifoOrder()) {
-                const { x, y } = this.currentPlayer.getMoveHistory()[playerTotalMoves - numPieces - 1];
-                
+                const { x, y } = this.currentPlayer.getMoveHistory()[moveToTakeout];
+
                 this.board.removeMark(x, y);
                 return { x, y };
             }
             else {
-                // const history = this.currentPlayer.getMoveHistory().slice
+                // TODO: fix 
+                // get list of previous moves as far as the number of pieces.
+                //  //  minus 1 because doesn't want to include last move to eliminate.
+                const prevMoves = this.currentPlayer.getMoveHistory().slice(
+                    moveToTakeout,
+                    playerTotalMoves - 1
+                );
+
+                for (let i = moveToTakeout; i < this.currentPlayer.getTotalMoves(); i++) {
+                    if (ObjHelper.isEqualObjects(prevMoves[i], { x: xPos, y: yPos })) {
+                        return prevMoves[i];
+                    }
+                }
+                return false;
             }
         }
         return false;
@@ -286,11 +305,29 @@ export default class Game {
              * @returns {boolean} - boolean
              */
             size: (x, y) => {
+                // cannot be less than 3
+                if (x < 3 || y < 3) {
+                    const newX = x < 3 ? 3 : x;
+                    const newY = y < 3 ? 3 : y;
+                    this.board.updateSize(newX, newY);
+
+                    // TODO: REFACTOR 
+                    //  //  update associated vars
+                    this.config.winLength = 3;
+                    this.config.numPieces = 3;
+                    return false;
+                }
                 this.board.updateSize(x, y);
                 // check the appropriate winLength and update it.
                 if (x < this.config.winLength || y < this.config.winLength) {
                     const newWinLength = x < y ? x : y;
                     this.config.winLength = newWinLength;
+
+                    // TODO: REFACTOR
+                    //  //  update associated vars
+                    if (newWinLength > this.config.numPieces) {
+                        this.config.numPieces = newWinLength;
+                    }
                 }
                 return true;
             },
@@ -299,15 +336,27 @@ export default class Game {
              * @returns {boolean} - boolean
              */
             winLength: (len) => {
-                // check the appropriate winLength
-                if (this.getBoard().getSize()['x'] >= len || this.getBoard().getSize()['y'] >= len) {
+                // cannot be less than 3
+                if (len < 3) {
+                    this.config.winLength = 3;
 
-                    // cannot be less than 3
-                    if (len < 3) {
-                        this.config.winLength = 3;
+                    // TODO: REFACTOR
+                    //  //  update associated vars
+                    if (this.config.winLength > this.config.numPieces) {
+                        this.config.numPieces = this.config.winLength;
                     }
-                    else {
-                        this.config.winLength = len;
+
+                    return false;
+                }
+                // check the appropriate winLength
+                const xLen = this.getBoard().getSize()['x'];
+                const yLen = this.getBoard().getSize()['y'];
+                if (xLen >= len || yLen >= len) {
+                    this.config.winLength = len;
+                    // TODO: REFACTOR
+                    //  //  update associated vars
+                    if (this.config.winLength > this.config.numPieces) {
+                        this.config.numPieces = this.config.winLength;
                     }
                     return true;
                 }
@@ -341,6 +390,12 @@ export default class Game {
 
                     if (this.config.numPieces < this.config.winLength) {
                         this.config.numPieces = this.config.winLength;
+
+                        // TODO: REFACTOR
+                        //  //  update associated vars
+                        if (this.config.numPieces < 3) {
+                            this.config.numPieces = 3;
+                        }
                     }
                     return true;
                 }

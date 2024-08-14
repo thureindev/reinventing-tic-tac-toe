@@ -1,6 +1,7 @@
 import '../../styles/dynamic-board.css';
 import { ele } from './_htmlElementSelector';
 import gameController from "../controllers/gameController";
+import { generateSquareName } from '../gameObjects/utils/generateSquareName';
 
 const gameBoardView = Object.freeze({
     /**
@@ -21,7 +22,14 @@ const gameBoardView = Object.freeze({
             for (let ii = 0; ii < sizeX; ii++) {
                 // Add cells to the current row
                 html += `
-                <div class="cell" data-cell="${ii}-${i}" data-square-name="${ii + 1}${i + 1}">
+                <div class="cell" data-cell="${ii}-${i}">
+                    <span class="square-name" data-square-name="${ii + 1}-${i + 1}">
+                        ${generateSquareName(i, ii)}
+                    </span>
+
+                    <span class="mark"></span>
+
+                    <span class="move-order"></span>
                 </div>`
             }
             // Close the container for the row
@@ -35,7 +43,7 @@ const gameBoardView = Object.freeze({
          * This one is for dynamic CSS grid.
          * 
          * Important Note ! Row is Y axis and Col is X axis 
-         */ 
+         */
         ele.getGameBoard().style.setProperty('--rows', sizeY);
         ele.getGameBoard().style.setProperty('--cols', sizeX);
 
@@ -52,7 +60,7 @@ const gameBoardView = Object.freeze({
             try {
                 const cell = e.target.getAttribute('data-cell');
                 const [x, y] = cell.split('-').map(n => Number(n));
-                
+
                 // attach event to game controller 
                 gameController.emit('clicked-board-cell', x, y);
 
@@ -66,13 +74,32 @@ const gameBoardView = Object.freeze({
      * @param {number} y 
      * @param {string} mark 
      */
-    handlePlaceMark: (x, y, mark) => {
-        const cell = document.querySelector(`[data-cell="${x}-${y}"]`);
-        cell.innerText = mark;
+    handlePlaceMark: (x, y, mark, order) => {
+        const cellMark = ele.getCellChildMark(x, y);
+        cellMark.innerText = mark;
+
+        const cellMoveOrder = ele.getCellChildMoveOrder(x, y);
+        cellMoveOrder.innerText = order;
     },
     handleRemoveMark: (x, y) => {
-        const cell = document.querySelector(`[data-cell="${x}-${y}"]`);
-        cell.innerText = '';
+        const cellMark = ele.getCellChildMark(x, y);
+        cellMark.innerText = '';
+
+        const cell = ele.getCellOnBoard(x, y);
+        // CSS stylize update // reset to default empty cell
+        cell.style.setProperty('background-color', 'var(--board-bg-color)');
+        cell.style.setProperty('color', 'var(--board-color)');
+    },
+    addMoveOrderGradient: (moveHistory, totalPiecesOnBoard, color) => {
+        let i = 1, seg = 0.8 / totalPiecesOnBoard;
+
+        for (const { x, y } of moveHistory) {
+            const cell = ele.getCellOnBoard(x, y);
+            // CSS stylize update
+            cell.style.setProperty('background-color', `rgba(${color['r']}, ${color['g']}, ${color['b']}, ${i * seg})`);
+            cell.style.setProperty('color', 'var(--cell-gradient-overlay-color)');
+            i++;
+        }
     },
     /**
      * 

@@ -1,11 +1,24 @@
+/* Variables */
+:root {
+    --main-bg-color: #242424;
+    --main-color: rgba(255, 255, 255, 0.87);
+    --primary-color: #646cff;
+    --btn-hover-color: #535bf2;
+    --board-border-color: rgba(251, 188, 57, .36);
+    --board-color: rgb(177, 177, 177);
+    --board-bg-color: #1a1a1a;
+    --cell-gradient-overlay-color: #1a1a1a;
+    /* --font-size: 16px; */
+}
+
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
 
     color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+    color: var(--main-color);
+    background-color: var(--main-bg-color);
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -13,7 +26,8 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     height: 100%;
@@ -30,12 +44,12 @@ body {
 
 a {
     font-weight: 500;
-    color: #646cff;
+    color: var(--primary-color);
     text-decoration: inherit;
 }
 
 a:hover {
-    color: #535bf2;
+    color: var(--btn-hover-color);
 }
 
 h1 {
@@ -66,7 +80,8 @@ h1 {
 .game-config {
     height: 20vh;
     width: 100vw;
-    background-color: lightgray; /* Example styling */
+    background-color: var(--main-bg-color);
+    /* Example styling */
     overflow-y: scroll;
 }
 
@@ -78,12 +93,8 @@ h1 {
 }
 
 .game-board .row {
-    display: contents; /* Make the row element invisible in the layout but keep its children visible */
-}
-
-.game-board .cell {
-    background-color: black;
-    border: 1px solid #333;
+    display: contents;
+    /* Make the row element invisible in the layout but keep its children visible */
 }
 
 .game-board .cell {
@@ -96,8 +107,10 @@ h1 {
     font-weight: 500;
     font-family: inherit;
 
-    background-color: #1a1a1a;
-    border: 1px solid #333;
+    background-color: var(--board-bg-color);
+    /* border: 1px solid rgba(64, 143, 248, .16); */
+    border: 1px solid var(--board-border-color);
+    color: var(--board-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,12 +119,41 @@ h1 {
 }
 
 .cell:hover {
-    border-color: #646cff;
+    border-color: var(--btn-hover-color);
 }
 
 .cell:focus,
 .cell:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
+}
+
+.game-board .cell {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-board .cell>.square-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 0.5em;
+    margin: 5px;
+}
+
+.game-board .cell>.mark {
+    text-align: center;
+    font-size: 2em;
+}
+
+.game-board .cell>.move-order {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 1em;
+    margin: 5px;
 }
 
 @media (orientation: landscape) {
@@ -135,7 +177,7 @@ h1 {
     }
 
     a:hover {
-        color: #747bff;
+        color: var(--btn-hover-color);
     }
 
     button {

@@ -1,9 +1,9 @@
 export const gameConfig = {
-    boardSizeX: 4,
-    boardSizeY: 5,
+    boardSizeX: 3,
+    boardSizeY: 3,
     winLength: 3,
     isLimitedPieces: true,
-    numPieces: 0,
+    numPieces: 3,
     isFifoOrder: true,
     
     updateGameConfigData: function (updates) {

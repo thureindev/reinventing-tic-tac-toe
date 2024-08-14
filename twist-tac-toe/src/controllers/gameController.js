@@ -6,6 +6,7 @@ import { game } from "../data/Game";
 import { gameConfig } from '../data/GameConfig';
 import GameState from "../gameObjects/enums/gameState";
 import GameProp from '../gameObjects/enums/gameProp';
+import Role from '../gameObjects/enums/role';
 
 const gameController = new EventHandler();
 
@@ -18,7 +19,6 @@ const gameController = new EventHandler();
  * clicked-board-cell
  */
 gameController.on('clicked-board-cell', (x, y) => {
-    const playerMark = game.getCurrentPlayer().getMark();
 
     const isValidMove = game.playerMakeMove(x, y);
     if (!isValidMove) {
@@ -37,6 +37,10 @@ gameController.on('clicked-board-cell', (x, y) => {
             alert('Invalid move at cell' + x + '-' + y);
         }
     }
+    /**
+     * Valid play move comes here, above are invalid scenes.
+     * 
+     */
     else {
         console.log('Validly moved at cell' + x + '-' + y);
 
@@ -47,10 +51,34 @@ gameController.on('clicked-board-cell', (x, y) => {
             gameBoardView.handleRemoveMark(cell['x'], cell['y']);
         }
 
-        // update the view component
-        gameBoardView.handlePlaceMark(x, y, playerMark);
+        // VIEW UPDATE
+        //  //  place mark
+        const playerMark = game.getCurrentPlayer().getMark();
+        gameBoardView.handlePlaceMark(x, y, playerMark, game.getCurrentPlayer().getTotalMoves());
 
-        // update the game object
+        //  //  gradient player moves
+        const playerMoves = game.getCurrentPlayer().getTotalMoves();
+        const numPieces = game.getNumPiecesEachPlayer();
+        const earliestMoveIndex = playerMoves > numPieces ? playerMoves - numPieces : 0;
+        //  //  get move history
+        const history = game.getCurrentPlayer().getMoveHistory().slice(
+            earliestMoveIndex,
+            playerMoves
+        );
+        console.log('history: ', history);
+        let color;
+        let currPlayer = game.getCurrentPlayer().getRole();
+        if (currPlayer === Role.P1) {
+            color = { r: 78, g: 201, b: 176 };
+        }
+        else if (currPlayer === Role.P2) {
+            color = { r: 218, g: 85, b: 131 };
+        }
+        const totalPiecesOnBoard = numPieces > playerMoves ? playerMoves : numPieces;
+        gameBoardView.addMoveOrderGradient(history, totalPiecesOnBoard, color);
+
+        // DATA UPDATE
+        //  //  turn swap happens here
         game.updateGameStateByLastMove(x, y);
 
         // check game state and show result
@@ -81,23 +109,33 @@ gameController.on('config-board-size-changed', (x, y) => {
 
     const updateSuccess = game.updateGameConfig(GameProp.SIZE, { x, y });
     if (updateSuccess) {
-        //  //  game win length is calculated and updated according to size of the board.
-        const newWinLength = game.getWinningLineLength();
+        // TODO: REFACTOR
+        //  //  update associated vars
         // VIEW UPDATE
         //  //  input
-        ele.getInputWinLength().value = newWinLength;
+        ele.getInputWinLength().value = game.getWinningLineLength();
+        ele.getInputNumPieces().value = game.getNumPiecesEachPlayer();
         //  //  board
         gameBoardView.generateBoard(x, y);
         //
         // update game config file
-        gameConfig.updateGameConfigData({ boardSizeX: x, boardSizeY: y, winLength: newWinLength });
+        gameConfig.updateGameConfigData({ boardSizeX: x, boardSizeY: y, winLength: game.getWinningLineLength() });
     }
     else {
+        // TODO: REFACTOR
+        //  //  update associated vars
+        //  //  game win length is calculated and updated according to size of the board.
+        const newWinLength = game.getWinningLineLength();
+        const newNumPieces = game.getNumPiecesEachPlayer();
         // VIEW UPDATE
         //  //  reset the changed values in view to previous data in game object. 
         ele.getInputBoardSizeX().value = game.getBoard().getSize()['x'];
         ele.getInputBoardSizeY().value = game.getBoard().getSize()['y'];
-        ele.getInputWinLength().value = game.getWinningLineLength();
+        ele.getInputWinLength().value = newWinLength;
+        ele.getInputNumPieces().value = newNumPieces;
+        //
+        // update game config file
+        gameConfig.updateGameConfigData({ boardSizeX: x, boardSizeY: y, winLength: game.getWinningLineLength() });
         //
         // TODO: notify user
         if (game.isDuringMatch()) {
@@ -121,9 +159,15 @@ gameController.on('config-win-length-changed', (len) => {
         gameConfig.updateGameConfigData({ winLength: len, numPieces: game.getNumPiecesEachPlayer() });
     }
     else {
+        // TODO: REFACTOR
+        //  //  update associated vars
         // VIEW UPDATE
         //  //  reset the changed values in view to previous data in game object. 
         ele.getInputWinLength().value = game.getWinningLineLength();
+        ele.getInputNumPieces().value = game.getNumPiecesEachPlayer();
+        //
+        // update game config file
+        gameConfig.updateGameConfigData({ winLength: game.getWinningLineLength() });
         //
         // TODO: notify user
         if (game.isDuringMatch()) {
@@ -172,6 +216,9 @@ gameController.on('config-num-pieces-changed', (num) => {
         // VIEW UPDATE
         //  //  reset the changed values in view to previous data in game object. 
         ele.getInputNumPieces().value = game.getNumPiecesEachPlayer();
+        //
+        // update game config file
+        gameConfig.updateGameConfigData({ boardSizeX: x, boardSizeY: y, winLength: game.getWinningLineLength() });
         //
         // TODO: notify user
         if (game.isDuringMatch()) {
