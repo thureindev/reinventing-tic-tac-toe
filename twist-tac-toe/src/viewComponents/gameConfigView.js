@@ -36,12 +36,10 @@ const gameConfigView = Object.freeze({
                     <input type="number" id="num-pieces" name="num-pieces" min="3" max="100" value="${config.numPieces}"
                     ${config.isLimitedPieces ? '' : 'disabled'}>
                 </div>
-                
-                <div class="input-group">
-                    <label for="is-fifo-order">Remove Pieces by FIFO Order:</label>
-                    <input type="checkbox" id="is-fifo-order" name="is-fifo-order" ${config.isFifoOrder ? 'checked' : ''}
-                    ${config.isLimitedPieces ? '' : 'disabled'}>
-                </div>
+
+                <a id="game-file-save">
+                    Save Game Result
+                </a>
                 
 
             </div>
@@ -52,52 +50,52 @@ const gameConfigView = Object.freeze({
             </div>
         </div>
         `
-
-        /**
-         * Event listeners
-         * ==============================================================
-         */
+        
+        // Event listeners
+        // ==============================================================
 
         ele.getInputBoardSizeX().addEventListener('input', (e) => {
             const x = Number(e.target.value);
-            gameController.emit('config-board-size-changed', x, config.boardSizeY);
+            const y = config.boardSizeY;
+            gameController.emit('changed-board-size', { x, y });
         });
+        
         ele.getInputBoardSizeY().addEventListener('input', (e) => {
             const y = Number(e.target.value);
-            gameController.emit('config-board-size-changed', config.boardSizeX, y);
+            const x = config.boardSizeX;
+            gameController.emit('changed-board-size', { x, y });
         });
 
         ele.getInputWinLength().addEventListener('input', (e) => {
             const len = Number(e.target.value);
-            gameController.emit('config-win-length-changed', len);
+            gameController.emit('changed-win-length', len);
         });
 
         ele.getInputIsLimitedPieces().addEventListener('change', (e) => {
             const isLimited = e.target.checked;
-            gameController.emit('config-is-limited-pieces-changed', isLimited);
+            gameController.emit('changed-is-limited-pieces', isLimited);
         });
 
         ele.getInputNumPieces().addEventListener('input', (e) => {
             const num = Number(e.target.value);
-            gameController.emit('config-num-pieces-changed', num);
-        });
-
-        ele.getInputIsFifoOrder().addEventListener('change', (e) => {
-            const isFifo = e.target.checked;
-            gameController.emit('config-is-fifo-order-changed', isFifo);
+            gameController.emit('changed-num-pieces', num);
         });
 
         ele.getBtnStartMatch().addEventListener('click', (e) => {
             gameController.emit('start-match');
-        })
+        });
 
         ele.getBtnNextGame().addEventListener('click', (e) => {
             gameController.emit('next-game');
-        })
+        });
 
         ele.getBtnResetMatch().addEventListener('click', (e) => {
             gameController.emit('reset-match');
-        })
+        });
+
+        ele.getBtnGameFileSave().addEventListener('click', (e) => {
+            gameController.emit('save-game-result');
+        });
     }
 });
 

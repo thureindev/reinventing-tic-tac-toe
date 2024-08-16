@@ -5,9 +5,7 @@ import gameConfigView from './viewComponents/gameConfigView.js';
 
 document.querySelector('#app').innerHTML = `
     <div class="container">
-        
         <div class="game-config" id="game-config"></div>
-
         <div class="game-board" id="game-board"></div>
     </div>
 `

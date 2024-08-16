@@ -62,7 +62,7 @@ const gameBoardView = Object.freeze({
                 const [x, y] = cell.split('-').map(n => Number(n));
 
                 // attach event to game controller 
-                gameController.emit('clicked-board-cell', x, y);
+                gameController.emit('clicked-board-cell', { x, y });
 
             } catch (err) { console.log(err); }
         }
@@ -85,19 +85,31 @@ const gameBoardView = Object.freeze({
         const cellMark = ele.getCellChildMark(x, y);
         cellMark.innerText = '';
 
+        const cellMoveOrder = ele.getCellChildMoveOrder(x, y);
+        cellMoveOrder.innerText = '';
+
         const cell = ele.getCellOnBoard(x, y);
         // CSS stylize update // reset to default empty cell
         cell.style.setProperty('background-color', 'var(--board-bg-color)');
-        cell.style.setProperty('color', 'var(--board-color)');
+
+        cellMark.style.setProperty('color', 'var(--main-color)');
+        cellMoveOrder.style.setProperty('color', 'var(--main-color)');
     },
-    addMoveOrderGradient: (moveHistory, totalPiecesOnBoard, color) => {
+    addMoveOrderGradient: (moveHistory, totalPiecesOnBoard, numPieces, color) => {
         let i = 1, seg = 0.8 / totalPiecesOnBoard;
 
         for (const { x, y } of moveHistory) {
             const cell = ele.getCellOnBoard(x, y);
             // CSS stylize update
-            cell.style.setProperty('background-color', `rgba(${color['r']}, ${color['g']}, ${color['b']}, ${i * seg})`);
-            cell.style.setProperty('color', 'var(--cell-gradient-overlay-color)');
+            // cell.style.setProperty('background-color', `rgba(${color['r']}, ${color['g']}, ${color['b']}, ${i * seg})`);
+            // cell.style.setProperty('color', 'var(--cell-gradient-overlay-color)');
+
+            const cellMoveOrder = ele.getCellChildMoveOrder(x, y);
+            cellMoveOrder.style.setProperty('color', `rgba(${color['r']}, ${color['g']}, ${color['b']}, 1)`);
+
+            const cellMark = ele.getCellChildMark(x, y);
+            cellMark.style.setProperty('color', `rgba(${color['r']}, ${color['g']}, ${color['b']}, 1)`);
+
             i++;
         }
     },
@@ -110,7 +122,6 @@ const gameBoardView = Object.freeze({
         const cell = document.querySelector(`[data-cell="${x}-${y}"]`);
         cell.classList.add('win-cell');
     },
-
 });
 
 export default gameBoardView;

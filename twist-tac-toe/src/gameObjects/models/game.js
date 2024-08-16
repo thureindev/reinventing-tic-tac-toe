@@ -23,7 +23,6 @@ export default class Game {
      * @param {number} boardSize - The boardSize of the board.
      * @param {number} winLength - The length of winning line on board.
      * @param {number} numPieces - The pieces players can play on board.
-     * @param {boolean} isFifoOrder - First in first out elimination option for pieces played on board .
      */
     constructor(
         boardSizeX = gameConfig.boardSizeX,
@@ -31,13 +30,11 @@ export default class Game {
         winLength = gameConfig.winLength,
         isLimited = gameConfig.isLimitedPieces,
         numPieces = gameConfig.numPieces,
-        isFifoOrder = gameConfig.isFifoOrder
     ) {
         this.config = {
             winLength: winLength,
             isLimitedPieces: isLimited,
             numPieces: numPieces,
-            isFifoOrder: isFifoOrder,
         }
         this.board = new Board(boardSizeX, boardSizeY);
         this.player1 = new Player('Player 1', 'X', Role.P1);
@@ -128,8 +125,6 @@ export default class Game {
                     return this.updateConfigProp().isLimitedPieces(arg['isLimited']);
                 case GameProp.NUM_PIECES:
                     return this.updateConfigProp().numPieces(arg['num']);
-                case GameProp.IS_FIFO_ORDER:
-                    return this.updateConfigProp().isFifoOrder(arg['isFifo']);
                 default:
                     return false;
             }
@@ -190,7 +185,7 @@ export default class Game {
      * @returns {boolean} - returns true or false after checking valid moves.
      */
     checkValidMoves() {
-        // The logic used to validate moves will be affected by 'isLimitedPieces' and 'isFifoOrder'
+        // The logic used to validate moves will be affected by 'isLimitedPieces'
         return this.board.hasPlayableSquares();
     }
     /**
@@ -202,7 +197,7 @@ export default class Game {
      * @returns {boolean} - boolean
      */
     playerMakeMove(x, y) {
-        // The logic used to validate moves will be affected by 'isLimitedPieces' and 'isFifoOrder'
+        // The logic used to validate moves will be affected by 'isLimitedPieces'
 
         // only proceed if game is ongoing
         if (this.state !== GameState.ONGOING) return false;
@@ -227,28 +222,10 @@ export default class Game {
             const earliestMoveIndex = playerTotalMoves - numPieces;
             const moveToTakeout = earliestMoveIndex - 1;
 
-            if (this.getIsFifoOrder()) {
-                const { x, y } = this.currentPlayer.getMoveHistory()[moveToTakeout];
+            const { x, y } = this.currentPlayer.getMoveHistory()[moveToTakeout];
 
-                this.board.removeMark(x, y);
-                return { x, y };
-            }
-            else {
-                // TODO: fix 
-                // get list of previous moves as far as the number of pieces.
-                //  //  minus 1 because doesn't want to include last move to eliminate.
-                const prevMoves = this.currentPlayer.getMoveHistory().slice(
-                    moveToTakeout,
-                    playerTotalMoves - 1
-                );
-
-                for (let i = moveToTakeout; i < this.currentPlayer.getTotalMoves(); i++) {
-                    if (ObjHelper.isEqualObjects(prevMoves[i], { x: xPos, y: yPos })) {
-                        return prevMoves[i];
-                    }
-                }
-                return false;
-            }
+            this.board.removeMark(x, y);
+            return { x, y };
         }
         return false;
     }
@@ -401,15 +378,6 @@ export default class Game {
                 }
                 return false;
             },
-            /**
-             * 
-             * @param {boolean} isFifo - 
-             * @returns {boolean} - boolean
-             */
-            isFifoOrder: (isFifo) => {
-                this.config.isFifoOrder = isFifo;
-                return true;
-            },
 
         });
     }
@@ -437,13 +405,6 @@ export default class Game {
      */
     getNumPiecesEachPlayer() {
         return this.config.numPieces;
-    }
-    /**
-     * -----------------------------------------------------------------
-     * @returns {boolean} - First in first out elimination option for pieces played on board. 
-     */
-    getIsFifoOrder() {
-        return this.config.isFifoOrder;
     }
     /**
      * -----------------------------------------------------------------
@@ -512,7 +473,7 @@ export default class Game {
      * -----------------------------------------------------------------
      * @returns {number} - total games played in this match.
      */
-    getGamesPlayedInMatch() {
+    getTotalGamesPlayedInMatch() {
         return this.totalGamesPlayed;
     }
     /**

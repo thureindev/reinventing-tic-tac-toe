@@ -7,7 +7,8 @@ export const ele = Object.freeze({
     getInputWinLength: () => document.getElementById('win-length'),
     getInputIsLimitedPieces: () => document.getElementById('is-limited-pieces'),
     getInputNumPieces: () => document.getElementById('num-pieces'),
-    getInputIsFifoOrder: () => document.getElementById('is-fifo-order'),
+    
+    getBtnGameFileSave: () => document.getElementById('game-file-save'),
 
     getBtnStartMatch: () => document.getElementById('start-match'),
     getBtnNextGame: () => document.getElementById('next-game'),

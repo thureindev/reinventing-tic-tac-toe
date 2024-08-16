@@ -4,7 +4,6 @@ export const gameConfig = {
     winLength: 3,
     isLimitedPieces: true,
     numPieces: 3,
-    isFifoOrder: true,
     
     updateGameConfigData: function (updates) {
         Object.assign(this, updates);

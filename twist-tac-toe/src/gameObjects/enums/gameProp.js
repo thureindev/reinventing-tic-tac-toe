@@ -8,7 +8,6 @@ const GameProp = Object.freeze({
     WIN_LENGTH: 'win-length',
     IS_LIMITED_PIECES: 'is-limited-pieces',
     NUM_PIECES: 'num-pieces',
-    IS_FIFO_ORDER: 'is-fifo-order',
     NONE: null,
 });
 
