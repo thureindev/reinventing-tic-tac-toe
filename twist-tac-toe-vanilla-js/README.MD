@@ -4,6 +4,11 @@
 
 This document provides an overview of the Tic-Tac-Toe game application, developed using the Model-View-Controller (MVC) architecture. The following sections describe the overall code structure, key components, and their interactions.
 
+## Tech Stack
+
+- Vanilla JS with no external library or framework used.
+- Vite to run JS modules via http localhost.
+
 ## Project Structure
 
 The Tic-Tac-Toe game is organized into three main components according to the MVC architecture:
@@ -20,10 +25,12 @@ The Tic-Tac-Toe game is organized into three main components according to the MV
   - `player1`: Represents the first player, including attributes like `name` and `symbol`.
   - `player2`: Represents the second player, including attributes like `name` and `symbol`.
   - `currentPlayer`: Tracks the player currently taking their turn.
-  - `gameStatus`: Indicates the current state of the game (e.g., ongoing, won, or draw).
+  - `gameState`: Indicates the current state of the game (e.g., ready, ongoing, or finished).
+  - `config`: Configuration data such as size of board, winning line length etc.
 
 - **Methods**:
-  - `initializeGame()`: Initializes the game state.
+  - `readyGame()`: Initializes the game state. reset necessary vars.
+  - `resetGame()`: Reset everthing for a fresh start.
   - `makeMove(position)`: Processes a move at the given position.
   - `checkWinner()`: Checks the game board for a winning condition.
   - `checkDraw()`: Checks if the game has ended in a draw.
@@ -40,6 +47,7 @@ The Tic-Tac-Toe game is organized into three main components according to the MV
 - **Methods**:
   - `render()`: Draws the game board.
   - `updateCell(position, symbol)`: Updates a specific cell in the view.
+  - `inputEvent(e)`: Signals input events to GameController to process. 
 
 #### Game Configuration View Component
 - **Responsibilities**:
@@ -49,6 +57,7 @@ The Tic-Tac-Toe game is organized into three main components according to the MV
 - **Methods**:
   - `render()`: Displays the configuration options.
   - `updateSettings(settings)`: Updates game settings based on user input.
+  - `inputEvent(e)`: Signals input events to GameController to process. 
 
 ### Controller
 
@@ -62,6 +71,7 @@ The Tic-Tac-Toe game is organized into three main components according to the MV
   - `handleMove(position)`: Processes a move request from the view.
   - `updateGameStatus()`: Updates the game status and triggers necessary updates.
   - `handleConfigurationChange(settings)`: Updates the game configuration based on user input.
+  - `handleViewUpdates()`: Communicate view componets to update view according to the data updates.
 
 ## Interaction Flow
 
@@ -90,14 +100,6 @@ The Tic-Tac-Toe game is organized into three main components according to the MV
 - **Code Contributions**:
   - Follow the project's coding standards and document any new features or changes thoroughly.
   - Use descriptive commit messages to help track changes.
-
-- **Issue Tracking**:
-  - Report and track issues using the project's issue tracker.
-  - Provide detailed descriptions and steps to reproduce any bugs or issues.
-
-- **Code Review**:
-  - Review code contributions from team members and provide constructive feedback.
-  - Ensure that changes align with the project’s architecture and design principles.
 
 ## License
 

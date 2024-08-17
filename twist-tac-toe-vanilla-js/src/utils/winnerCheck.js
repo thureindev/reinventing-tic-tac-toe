@@ -1,5 +1,5 @@
-import Board from "../models/board";
-import Player from "../models/player";
+import Board from "../gameObjects/models/board";
+import Player from "../gameObjects/models/player";
 
 /**
  * Important Note ! Row is Y axis and Col is X axis 

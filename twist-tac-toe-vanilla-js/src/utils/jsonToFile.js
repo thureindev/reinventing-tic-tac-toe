@@ -1,4 +1,4 @@
-import { ele } from "../../viewComponents/_htmlElementSelector";
+import { ele } from "../viewComponents/_htmlElementSelector";
 
 export const JSONToFile = (obj, filename) => {
     const blob = new Blob([JSON.stringify(obj)], {

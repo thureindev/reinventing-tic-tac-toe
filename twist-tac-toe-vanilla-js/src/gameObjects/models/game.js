@@ -3,9 +3,8 @@ import Player from './player.js';
 import Role from '../enums/role.js';
 import GameState from '../enums/gameState.js';
 import GameProp from '../enums/gameProp.js';
-import { winnerCheckingSlidingWindow } from '../utils/winnerCheck.js';
+import { winnerCheckingSlidingWindow } from '../../utils/winnerCheck.js';
 import { gameConfig } from '../../data/GameConfig.js';
-import ObjHelper from '../utils/ObjHelper.js';
 
 /**
  * Represents a game object

@@ -1,5 +1,5 @@
 import { game } from "../../data/Game";
-import { JSONToFile } from "../../gameObjects/utils/jsonToFile";
+import { JSONToFile } from "../../utils/jsonToFile";
 import GameState from "../../gameObjects/enums/gameState";
 
 export default function saveGameResult() {
@@ -9,7 +9,7 @@ export default function saveGameResult() {
             winLength: game.getWinningLineLength(),
             isLimitedPieces: game.getIsLimitedPieces(),
             numPieces: game.getNumPiecesEachPlayer(),
-            winner: game.getGameWinner().getRole(),
+            winner: game.getGameWinner(),
             p1Score: game.getPlayer1().getScore(),
             p2Score: game.getPlayer2().getScore(),
             p1MoveHistory: game.getPlayer1().getMoveHistory(),

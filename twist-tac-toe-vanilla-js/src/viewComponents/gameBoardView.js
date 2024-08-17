@@ -1,7 +1,7 @@
 import '../../styles/dynamic-board.css';
 import { ele } from './_htmlElementSelector';
 import gameController from "../controllers/gameController";
-import { generateSquareName } from '../gameObjects/utils/generateSquareName';
+import { generateSquareName } from '../utils/generateSquareName';
 
 const gameBoardView = Object.freeze({
     /**

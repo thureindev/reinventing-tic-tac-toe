@@ -17,7 +17,7 @@ gameController.on('start-match', () => _func.startMatch());
 gameController.on('next-game', () => _func.nextGame());
 //  //  regardless of game state reset-match can be carried out. 
 gameController.on('reset-match', () => _func.resetMatch());
-
+//
 // SAVE GAME HISTORY EVENT
 gameController.on('save-game-result', () => _func.saveGameResult());
 
