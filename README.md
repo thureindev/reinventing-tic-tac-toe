@@ -7,9 +7,9 @@ This is my personal project to level up my programming skills after a period of 
 Thanks for stopping by!
 
 # How to use
-1. Navigate to the twist-tac-toe-vanilla-js folder.
+1. Navigate to the app-vanilla-js folder.
    ```bash
-   cd twist-tac-toe-vanilla-js
+   cd app-vanilla-js
    ```
 2. Install vite dependencies.
    ```bash

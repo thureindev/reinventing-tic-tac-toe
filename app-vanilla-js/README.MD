@@ -104,4 +104,3 @@ The Tic-Tac-Toe game is organized into three main components according to the MV
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
