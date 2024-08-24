@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "app-vue-tailwind"
+		},
+		{
+			"path": "app-vanilla-js"
+		}
+	],
+	"settings": {}
+}
